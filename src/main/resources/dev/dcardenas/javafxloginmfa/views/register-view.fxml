@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="380.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.dcardenas.javafxloginmfa.ui.RegisterController">
+    <left>
+        <AnchorPane prefHeight="400.0" prefWidth="255.0" BorderPane.alignment="CENTER">
+            <children>
+                <ImageView fitHeight="180.0" fitWidth="200.0" layoutX="42.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../../images/chatgpt_image_not_real.png" />
+                    </image></ImageView>
+            </children></AnchorPane>
+    </left>
+    <right>
+        <AnchorPane prefHeight="380.0" prefWidth="300.0" BorderPane.alignment="CENTER">
+            <children>
+            <Group layoutX="60.0" layoutY="111.0">
+               <children>
+                  <Label layoutY="3.0" text="First Name:" textAlignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="firstname" layoutX="74.0" prefHeight="25.0" prefWidth="105.0" promptText="First name">
+                     <font>
+                        <Font name="System Italic" size="12.0" />
+                     </font>
+                  </TextField>
+                  <Label layoutY="36.0" text="Last Name:" textAlignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="lastname" layoutX="74.0" layoutY="33.0" prefHeight="25.0" prefWidth="105.0" promptText="Last name">
+                     <font>
+                        <Font name="System Italic" size="12.0" />
+                     </font>
+                  </TextField>
+                        <Label layoutY="69.0" text="Username:" textAlignment="CENTER">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="usernameField" layoutX="74.0" layoutY="66.0" prefHeight="25.0" prefWidth="105.0" promptText="Username">
+                            <font>
+                                <Font name="System Italic" size="12.0" />
+                            </font>
+                        </TextField>
+                        <Label layoutX="2.0" layoutY="100.0" text="Password:" textAlignment="CENTER">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                        <PasswordField fx:id="passwordField" layoutX="74.0" layoutY="97.0" prefHeight="25.0" prefWidth="105.0" promptText="Password">
+                            <font>
+                                <Font name="System Italic" size="12.0" />
+                            </font>
+                        </PasswordField>
+                        <Button fx:id="registerButton" layoutX="14.0" layoutY="132.0" mnemonicParsing="false" onAction="#attemptUserRegistration" prefHeight="30.0" prefWidth="68.0" text="Register">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Button>
+                  <Button fx:id="backToLoginButton" layoutX="100.0" layoutY="132.0" mnemonicParsing="false" onAction="#backToLogin" prefHeight="30.0" prefWidth="68.0" text="Go Back" textAlignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+                   <Label fx:id="registrationError" alignment="CENTER" layoutX="13.0" layoutY="175.0" prefHeight="32.0" prefWidth="155.0" textAlignment="CENTER" />
+               </children>
+            </Group>
+            </children></AnchorPane>
+    </right>
+    <padding>
+        <Insets left="15.0" right="15.0" />
+    </padding>
+</BorderPane>
