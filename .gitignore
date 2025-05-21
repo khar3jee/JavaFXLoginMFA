@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-## used for Jekyll/GitHub pages
-#_site/
-#.sass-cache/
-#.jekyll-cache/
-#.jekyll-metadata
 ## Add anything that you don't want committed
-=======
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -53,4 +46,3 @@ build/
 
 ### Mac OS ###
 .DS_Store
->>>>>>> 1a4b101 (Added project files, readme and todo)

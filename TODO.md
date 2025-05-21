@@ -2,12 +2,9 @@
 
 ---
 
-<<<<<<< HEAD
 - [ ] Write up CONTRIBUTING doc
 - [ ] Add pre-commit bits
 - [ ] Add design/prototyping/diagram bits
-
-=======
 - [ ] swap out all the System messages for logging through LogBack
 - [ ] Write up test for login
 - [ ] Write up test for logout
@@ -25,4 +22,3 @@
 - [ ] Add pre-commit hook for tests
 - [ ] Add pre-commit hook for security checks
 - [ ] Figure out how to automate changelog
->>>>>>> 1a4b101 (Added project files, readme and todo)
