@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 /**
  * @author Dave Cardenas
  * @version 0.0.9
- * App = launches app calls viewmanager
+ * App = launches app calls ViewManager
  * ViewManager = changes views dynamically as called
  * DatabaseManager = initializes and manages db interactions
  * LoginController = interfaces between FXML ui and login functions
