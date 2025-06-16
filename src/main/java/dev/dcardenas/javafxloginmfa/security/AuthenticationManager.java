@@ -12,28 +12,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import dev.dcardenas.javafxloginmfa.util.NetInfo;
 
 public class AuthenticationManager {
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationManager.class);
     private static final int MAX_FAILED_ATTEMPTS = 3;
     private static final int LOCKOUT_DURATION_MINUTES = 15;
 
-    public static boolean authenticate(String username, String password) {
-        return authenticate(username, password);
-    }
+    /**
+     * @param username
+     * @param password
+     * @return
+     */
 
-    public static boolean authenticate(String username, String password, String sourceIp) {
+    public static boolean authenticate(String username, String password) {
+        //String sourceIp = "127.0.0.1";
         if (isAccountLocked(username)) {
-            AuditLogger.log(username, "Authentication attempt", "LOGIN_FAILURE", sourceIp, "ACCOUNT_LOCKED");
+            AuditLogger.log(username, "Authentication attempt", "LOGIN_FAILURE", "ACCOUNT_LOCKED");
             return false;
         }
 
         boolean isAuthenticated = checkCredentials(username, password);
         if (isAuthenticated) {
             resetFailedAttempts(username);
-            AuditLogger.log(username, "User authenticated", "LOGIN_SUCCESS", sourceIp, "SUCCESS");
+            AuditLogger.log(username, "User authenticated", "LOGIN_SUCCESS", "SUCCESS");
             return true;
         } else {
-            incrementFailedAttempts(username, sourceIp);
+            incrementFailedAttempts(username);
             return false;
         }
     }
@@ -49,12 +56,12 @@ public class AuthenticationManager {
                 return com.password4j.Password.check(password, storedHash).withBcrypt();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Credential error for user '{}'", username, e);
         }
         return false;
     }
 
-    private static void incrementFailedAttempts(String username, String sourceIp) {
+    private static void incrementFailedAttempts(String username) {
         String sql = "UPDATE users SET failed_attempts = failed_attempts + 1 WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -63,12 +70,12 @@ public class AuthenticationManager {
 
             int attempts = getFailedAttempts(username);
             if (attempts >= MAX_FAILED_ATTEMPTS) {
-                lockAccount(username, sourceIp);
+                lockAccount(username);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Increment failed login attempts error for user '{}'", username, e);
         }
-        AuditLogger.log(username, "Failed login attempt", "LOGIN_FAILURE", sourceIp, "FAILURE");
+        AuditLogger.log(username, "Failed login attempt", "LOGIN_FAILURE", "FAILURE");
     }
 
     private static int getFailedAttempts(String username) {
@@ -81,12 +88,12 @@ public class AuthenticationManager {
                 return rs.getInt("failed_attempts");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Get failed login attempts error for user '{}'", username, e);
         }
         return 0;
     }
 
-    private static void lockAccount(String username, String sourceIp) {
+    private static void lockAccount(String username) {
         String sql = "UPDATE users SET locked_until = ? WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -94,9 +101,9 @@ public class AuthenticationManager {
             stmt.setString(2, username);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Account lockout error for user '{}'", username, e);
         }
-        AuditLogger.log(username, "Account locked due to multiple failed logins", "ACCOUNT_LOCKED", sourceIp, "LOCKED");
+        AuditLogger.log(username, "Account locked due to multiple failed logins", "ACCOUNT_LOCKED", "LOCKED");
     }
 
     private static boolean isAccountLocked(String username) {
@@ -110,7 +117,7 @@ public class AuthenticationManager {
                 return lockedUntil != null && lockedUntil.isAfter(LocalDateTime.now());
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Account lockout check error for user '{}'", username, e);
         }
         return false;
     }
@@ -122,7 +129,7 @@ public class AuthenticationManager {
             stmt.setString(1, username);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Account lockout reset error for user '{}'", username, e);
         }
     }
 }

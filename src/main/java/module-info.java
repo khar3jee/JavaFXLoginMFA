@@ -8,6 +8,7 @@ module dev.dcardenas.javafxloginmfa {
     requires java.sql;
     requires password4j;
     requires java.desktop;
+    requires org.slf4j;
 
     exports dev.dcardenas.javafxloginmfa.ui;
     opens dev.dcardenas.javafxloginmfa.ui to javafx.fxml;

@@ -10,8 +10,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoginController {
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
     public Button login;
 
     @FXML
@@ -26,9 +30,19 @@ public class LoginController {
 
     @FXML
     protected void attemptLogIn() {
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim();
-        //add source ip
+        String username = "";
+        String password = "";
+        try{
+            username = usernameField.getText().trim();
+            password = passwordField.getText().trim();
+          // add source ip 2025-06-15 18:40:48 ERROR d.d.j.ui.LoginController - getText field is null {}
+          // java.lang.NullPointerException: Cannot invoke "javafx.scene.control.TextField.getText()"
+            // because "this.usernameField" is null at
+          // dev.dcardenas.javafxloginmfa/dev.dcardenas.javafxloginmfa.ui.LoginController.attemptLogIn(LoginController.java:36)
+        } catch (NullPointerException e) {
+            loginError.setText("Username and password are required to login");
+            logger.error("getText field is null {}", e.getMessage()); //add ip to log
+        }
 
         if (AuthenticationManager.authenticate(username, password)) {
             //add source ip

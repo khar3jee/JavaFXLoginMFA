@@ -1,9 +1,12 @@
 package dev.dcardenas.javafxloginmfa.security;
 
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InputValidator {
 
+    private static final Logger logger = LoggerFactory.getLogger(InputValidator.class);
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]{3,20}$");
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}$");
 
