@@ -6,8 +6,11 @@ package dev.dcardenas.javafxloginmfa.db;
 import java.io.File;
 import java.nio.file.Paths;
 import java.sql.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatabaseManager {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
     private static final String DB_PATH = Paths.get(System.getProperty("user.dir"), "db", "javafxlogin.sqlite").toString();
     private static final String DB_URL = "jdbc:sqlite:" + DB_PATH;
     private static boolean databaseInitialized = false; // Prevent multiple inits
@@ -16,15 +19,27 @@ public class DatabaseManager {
         try {
             return DriverManager.getConnection(DB_URL);
         } catch (SQLException e) {
-            throw new RuntimeException("Database connection failed!", e);
+            logger.error("Database connection failed (url: {})", DB_URL, e);
+            throw new RuntimeException("Database connection failed because of ", e);
         }
     }
     public static void helperWipeDatabase() {
         //todo helper method to drop tables and delete database files as needed while testing
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
+            //stmt.execute("DROP TABLE users CASCADE CONSTRAINTS;");
+            //stmt.execute("DROP TABLE audit_log CASCADE CONSTRAINTS;");
+            stmt.executeUpdate("DROP TABLE IF EXISTS users");
+            stmt.executeUpdate("DROP TABLE IF EXISTS audit_log");
+        } catch (SQLException e) {
+            logger.error("issue attempting to drop tables {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
+
     public static void ensureDatabaseSetup() {
         if (databaseInitialized) {
-            System.out.println("Database already initialized. Skipping setup.");
+            logger.info("Database already initialized. Skipping setup.");
             return;
         }
         initializeDatabase();
@@ -33,52 +48,51 @@ public class DatabaseManager {
 
     private static void initializeDatabase() {
         ensureDbDirectoryExists();
-        checkDatabaseFile();
+        if (!okayDatabaseFile()){
+            try (Connection conn = getConnection();
+                 Statement stmt = conn.createStatement()) {
 
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
+                if (!doesTableExist("users")) {
+                    stmt.execute(
+                            """
+                                    CREATE TABLE users (
+                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        username TEXT UNIQUE NOT NULL,
+                                        password_hash TEXT NOT NULL,
+                                        firstname TEXT NOT NULL,
+                                        lastname TEXT NOT NULL,
+                                        email TEXT UNIQUE NOT NULL,
+                                        failed_attempts INTEGER DEFAULT 0,
+                                        locked_until DATETIME NULL,
+                                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                                    );
+                                """);
+                    logger.info("Users table created.");
+                } else {
+                    logger.info("Users table already exists.");
+                }
 
-            if (!doesTableExist("users")) {
-        stmt.execute(
-            """
-                    CREATE TABLE users (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        username TEXT UNIQUE NOT NULL,
-                        password_hash TEXT NOT NULL,
-                        firstname TEXT NOT NULL,
-                        lastname TEXT NOT NULL,
-                        email TEXT UNIQUE NOT NULL,
-                        failed_attempts INTEGER DEFAULT 0,
-                        locked_until DATETIME NULL,
-                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    );
-                """);
-                System.out.println("Users table created.");
-            } else {
-                System.out.println("Users table already exists.");
-            }
-
-            if (!doesTableExist("audit_log")) {
-                stmt.execute("""
+                if (!doesTableExist("audit_log")) {
+                    stmt.execute("""
                     CREATE TABLE audit_log (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         username TEXT,
                         action TEXT NOT NULL,
                         event_type TEXT NOT NULL,
                         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        source_ip TEXT,
-                        outcome TEXT NOT NULL
+                        outcome TEXT NOT NULL,
+                        fingerprint TEXT
                     );
                 """);
-                System.out.println("Audit log table created.");
-            } else {
-                System.out.println("Audit log table already exists.");
+                    logger.info("Audit log table created.");
+                } else {
+                    logger.info("Audit log table already exists.");
+                }
+                logger.info("Database initialized successfully.");
+            } catch (SQLException e) {
+                logger.error("Error initializing database: {}", e.getMessage());
+                throw new RuntimeException("Failed to initialize database", e);
             }
-
-            System.out.println("Database initialized successfully.");
-        } catch (SQLException e) {
-            System.err.println("Error initializing the database: " + e.getMessage());
-            throw new RuntimeException("Failed to initialize database", e);
         }
     }
 
@@ -87,24 +101,34 @@ public class DatabaseManager {
         if (!dbDir.exists()) {
             boolean created = dbDir.mkdirs();
             if (created) {
-                System.out.println("Created missing directory: " + dbDir.getAbsolutePath());
+                logger.info("Created missing directory at: {}", dbDir.getAbsolutePath());
             } else {
-                System.err.println("Failed to create database directory!");
+                logger.error("Failed to create database directory at path: {}", dbDir.getAbsolutePath());
             }
         }
     }
 
-    private static void checkDatabaseFile() {
+    private static boolean okayDatabaseFile() {
         File dbFile = new File(DB_PATH);
+        boolean answer = true;
+
         if (!dbFile.exists()) {
-            System.err.println("Database file not found: " + dbFile.getAbsolutePath());
+            logger.error("Database file not found at: {}", dbFile.getAbsolutePath());
+            answer = false;
         } else {
-            System.out.println("Database found at: " + dbFile.getAbsolutePath());
+            logger.info("Database found at: {}", dbFile.getAbsolutePath());
 
             if (!doesTableExist("users")) {
-                System.err.println("WARNING: Database file exists, but 'users' table is missing!");
+                logger.error("WARNING: Database file exists, but '{}' table is missing!", "users");
+                answer = false;
             }
+            if (!doesTableExist("audit_log")) {
+                logger.error("WARNING: Database file exists, but '{}' table is missing!", "audit_log");
+                answer = false;
+            }
+
         }
+        return answer;
     }
 
     private static boolean doesTableExist(String tableName) {
@@ -113,7 +137,7 @@ public class DatabaseManager {
              ResultSet rs = stmt.executeQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + tableName + "';")) {
             return rs.next();
         } catch (SQLException e) {
-            System.err.println("Error checking table existence: " + e.getMessage());
+            logger.error("Error checking table existence: {}", e.getMessage());
             return false;
         }
     }

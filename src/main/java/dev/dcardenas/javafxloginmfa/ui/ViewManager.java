@@ -4,8 +4,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class ViewManager {
+    private static final Logger logger = LoggerFactory.getLogger(ViewManager.class);
     private static Stage primaryStage;
 
     public static void setStage(Stage stage) {
@@ -18,7 +22,7 @@ public class ViewManager {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
         } catch (Exception e) {
-            System.err.println("Error switching view: " + e.getMessage());
+            logger.error("Error switching view: {}", e.getMessage());
         }
     }
 }

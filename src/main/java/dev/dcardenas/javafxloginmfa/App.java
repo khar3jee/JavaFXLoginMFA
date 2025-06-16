@@ -1,9 +1,13 @@
 package dev.dcardenas.javafxloginmfa;
 
+import dev.dcardenas.javafxloginmfa.audit.AuditLogReader;
+import dev.dcardenas.javafxloginmfa.audit.AuditLogger;
 import dev.dcardenas.javafxloginmfa.db.DatabaseManager;
 import dev.dcardenas.javafxloginmfa.ui.ViewManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Dave Cardenas
@@ -17,9 +21,14 @@ import javafx.stage.Stage;
  */
 
 public class App extends Application {
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+
     @Override
     public void start(Stage primaryStage) {
         DatabaseManager.ensureDatabaseSetup();
+        //System.out.println(AuditLogger.getSystemFingerprint());
+        //DatabaseManager.helperWipeDatabase();
+        //AuditLogReader.readAllAuditLogs();
 
         ViewManager.setStage(primaryStage);
         ViewManager.switchView("/dev/dcardenas/javafxloginmfa/views/login-view.fxml");
