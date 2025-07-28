@@ -6,6 +6,8 @@ import dev.dcardenas.javafxloginmfa.security.InputValidator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import dev.dcardenas.javafxloginmfa.user.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -24,7 +26,16 @@ public class RegisterController {
     private PasswordField passwordField;
 
     @FXML
-    private Button registerButton;
+    private TextField firstnameField;
+
+    @FXML
+    private TextField lastnameField;
+
+    @FXML
+    private TextField emailAddressField;
+
+    @FXML
+    private Button registerUserButton;
 
     @FXML
     private Button backToLoginButton;
@@ -32,35 +43,29 @@ public class RegisterController {
     @FXML
     private Label registrationError;
 
+    private User user;
+
     @FXML
     protected void attemptUserRegistration() {
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim();
-    // 2025-06-15 18:41:45 ERROR d.d.j.ui.RegisterController - Error registering user:
-    // [SQLITE_CONSTRAINT_NOTNULL] A NOT NULL constraint failed (NOT NULL constraint failed:
-    // users.firstname)
-    if (username.isEmpty() || password.isEmpty()) {
-            registrationError.setText("Please fill in all fields.");
-        } else {
-
-            // Hash the password using Password4j
-            String hashedPassword = Password.hash(password).withBcrypt().getResult();
-
-            String sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
-
-            try (Connection conn = DatabaseManager.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, username);
-                pstmt.setString(2, hashedPassword);
-                pstmt.executeUpdate();
-                logger.info("User Registered: {}", username);
-                ViewManager.switchView("/dev/dcardenas/javafxloginmfa/views/login-view.fxml"); // Go back to login after registration
-            } catch (SQLException e) {
+        try{
+            this.user = new User(
+                    new UserId(), //generates UUID internally
+                    new Username(usernameField.getText()),
+                    new UserPassword(passwordField.getText()), //12@asfleF345
+                    new FirstName(firstnameField.getText()),
+                    new LastName(lastnameField.getText()),
+                    new EmailAddress(emailAddressField.getText())
+            );
+        } catch (IllegalArgumentException | NullPointerException e) {
+            registrationError.setText(e.getMessage());
+        } try { DatabaseManager.saveUser(this.user);
+            logger.info("User Registered: {}", this.user.getUsername().value());
+            ViewManager.switchView("/dev/dcardenas/javafxloginmfa/views/login-view.fxml");
+        } catch (SQLException e) {
                 logger.error("Error registering user: {}", e.getMessage());
                 registrationError.setText("User registration failed, please try again.");
-            }
-            //password check?
         }
+
     }
 
     @FXML

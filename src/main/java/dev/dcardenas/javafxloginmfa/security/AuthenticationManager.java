@@ -16,12 +16,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dev.dcardenas.javafxloginmfa.util.NetInfo;
 
+import dev.dcardenas.javafxloginmfa.user.User;
+import dev.dcardenas.javafxloginmfa.user.UserPassword;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import static org.apache.commons.lang3.Validate.*;
+import dev.dcardenas.javafxloginmfa.util.NetInfo;
+
 public class AuthenticationManager {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationManager.class);
     private static final int MAX_FAILED_ATTEMPTS = 3;
     private static final int LOCKOUT_DURATION_MINUTES = 15;
+    private static final String PEPPER_ENV_NAME = "APP_PEPPER";
 
-    /**
+    public static void adminMenu(int option, String input){
+        switch (option){
+            case 1:
+                getFailedAttempts(input);
+                break;
+            case 2:
+                lockAccount(input);
+                break;
+            case 3:
+                isAccountLocked(input);
+                break;
+            case 4:
+                resetFailedAttempts(input);
+                break;
+        }
+
+
+    }
+
+  /**
      * @param username
      * @param password
      * @return
@@ -36,24 +63,34 @@ public class AuthenticationManager {
 
         boolean isAuthenticated = checkCredentials(username, password);
         if (isAuthenticated) {
+            //System.out.println("User Authenticated");
             resetFailedAttempts(username);
             AuditLogger.log(username, "User authenticated", "LOGIN_SUCCESS", "SUCCESS");
             return true;
         } else {
+            //System.out.println("User Not Authenticated");
             incrementFailedAttempts(username);
+            AuditLogger.log(username, "User attempted authentication", "LOGIN_FAILURE", "FAILED");
             return false;
         }
     }
 
     private static boolean checkCredentials(String username, String password) {
-        String sql = "SELECT password_hash FROM users WHERE username = ?";
+        String sql = "SELECT password_hash, salt FROM users WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 String storedHash = rs.getString("password_hash");
-                return com.password4j.Password.check(password, storedHash).withBcrypt();
+                String storedSalt = rs.getString("salt");
+                UserPassword userPw = new UserPassword(storedHash, storedSalt);
+                return userPw.matches(password);
+
+                //return com.password4j.Password.check(password, storedHash)
+                 //       .addPepper(getPepper())
+                   //     .addSalt(storedSalt)
+                     //   .withArgon2();
             }
         } catch (SQLException e) {
             logger.error("Credential error for user '{}'", username, e);
@@ -93,6 +130,7 @@ public class AuthenticationManager {
         return 0;
     }
 
+
     private static void lockAccount(String username) {
         String sql = "UPDATE users SET locked_until = ? WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection();
@@ -112,9 +150,20 @@ public class AuthenticationManager {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
+            //System.out.println("AcctLock1");
             if (rs.next()) {
                 LocalDateTime lockedUntil = rs.getObject("locked_until", LocalDateTime.class);
-                return lockedUntil != null && lockedUntil.isAfter(LocalDateTime.now());
+                try {
+                    notNull(lockedUntil);
+                } catch (NullPointerException e) {
+                    //System.out.println("locked until is null");
+                    return false;
+                }
+                //System.out.println("Locked: "+ lockedUntil);
+                return true;
+            } else {
+                //System.out.println("AcctLock False");
+                return false;
             }
         } catch (SQLException e) {
             logger.error("Account lockout check error for user '{}'", username, e);
@@ -131,5 +180,12 @@ public class AuthenticationManager {
         } catch (SQLException e) {
             logger.error("Account lockout reset error for user '{}'", username, e);
         }
+    }
+
+    public static String getPepper() {
+        final String pepper = System.getenv(PEPPER_ENV_NAME);
+        notNull(pepper);
+        logger.info("Pepper called");
+        return pepper;
     }
 }

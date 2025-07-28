@@ -12,7 +12,8 @@ public class AppController {
 
     @FXML
     protected void userLogoutButtonClick(ActionEvent event) {
-        ViewManager.switchView("/dev/dcardenas/javafxloginmfa/views/logout-view.fxml");
+        ViewManager.switchView("/dev/dcardenas/javafxloginmfa/views/login-view.fxml");
         // on logout sign user out and return to login scene
+        // should have a token or cookie which provides status
     }
 }

@@ -9,11 +9,26 @@ import java.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import dev.dcardenas.javafxloginmfa.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * DatabaseManager manages the database, adds/removes entities, tables and updates
+ */
 public class DatabaseManager {
+
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
     private static final String DB_PATH = Paths.get(System.getProperty("user.dir"), "db", "javafxlogin.sqlite").toString();
     private static final String DB_URL = "jdbc:sqlite:" + DB_PATH;
     private static boolean databaseInitialized = false; // Prevent multiple inits
+    //private final Connection connection;
+
+    //public DatabaseManager(Connection connection) {
+    //    this.connection = connection;
+        //DriverManager.getConnection(DB_URL)
+    //}
 
     public static Connection getConnection() {
         try {
@@ -23,8 +38,9 @@ public class DatabaseManager {
             throw new RuntimeException("Database connection failed because of ", e);
         }
     }
+
     public static void helperWipeDatabase() {
-        //todo helper method to drop tables and delete database files as needed while testing
+        // helper method to drop tables and delete database files as needed while testing
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             //stmt.execute("DROP TABLE users CASCADE CONSTRAINTS;");
@@ -34,6 +50,23 @@ public class DatabaseManager {
         } catch (SQLException e) {
             logger.error("issue attempting to drop tables {}", e.getMessage());
             throw new RuntimeException(e);
+        }
+        //delete db file?
+    }
+    public static void saveUser(User user) throws SQLException {
+        String sql = "INSERT INTO users (user_id, username, password_hash, salt, firstname, lastname, email_address) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setObject(1, user.getUserId().value());
+            pstmt.setObject(2, user.getUsername().value());
+            pstmt.setObject(3, user.getPassword().value());
+            pstmt.setObject(4, user.getSalt());
+            pstmt.setObject(5, user.getFirstName().value());
+            pstmt.setObject(6, user.getLastName().value());
+            pstmt.setObject(7, user.getEmailAddress().value());
+            pstmt.executeUpdate();
+            } catch (SQLException e) {
+            logger.error("issue attempting to save user {}", user, e);
         }
     }
 
@@ -56,12 +89,13 @@ public class DatabaseManager {
                     stmt.execute(
                             """
                                     CREATE TABLE users (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                        user_id TEXT PRIMARY KEY,
                                         username TEXT UNIQUE NOT NULL,
                                         password_hash TEXT NOT NULL,
+                                        salt TEXT NOT NULL,
                                         firstname TEXT NOT NULL,
                                         lastname TEXT NOT NULL,
-                                        email TEXT UNIQUE NOT NULL,
+                                        email_address TEXT UNIQUE NOT NULL,
                                         failed_attempts INTEGER DEFAULT 0,
                                         locked_until DATETIME NULL,
                                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -75,7 +109,7 @@ public class DatabaseManager {
                 if (!doesTableExist("audit_log")) {
                     stmt.execute("""
                     CREATE TABLE audit_log (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id TEXT PRIMARY KEY,
                         username TEXT,
                         action TEXT NOT NULL,
                         event_type TEXT NOT NULL,

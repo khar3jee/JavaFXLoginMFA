@@ -8,7 +8,9 @@ import java.util.Enumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * Collects network data to aid in auditing users and fingerprinting them.
+ */
 public class NetInfo {
 
     private static final Logger logger = LoggerFactory.getLogger(NetInfo.class);

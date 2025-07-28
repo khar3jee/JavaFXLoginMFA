@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="380.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.dcardenas.javafxloginmfa.ui.LoginController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="380.0" prefWidth="585.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.dcardenas.javafxloginmfa.ui.LoginController">
    <left>
-      <AnchorPane prefHeight="400.0" prefWidth="255.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="380.0" prefWidth="255.0" BorderPane.alignment="CENTER">
          <children>
             <ImageView fitHeight="180.0" fitWidth="200.0" layoutX="42.0" layoutY="100.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../images/chatgpt_image_not_real.png" />
+                  <Image url="@../../../images/fake_co_logo.svg.png" />
                </image></ImageView>
          </children></AnchorPane>
    </left>
@@ -31,7 +36,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="username" layoutX="74.0" prefHeight="25.0" prefWidth="105.0" promptText="Username">
+                  <TextField fx:id="usernameField" layoutX="74.0" prefHeight="25.0" prefWidth="105.0" promptText="Username">
                      <font>
                         <Font name="System Italic" size="12.0" />
                      </font>
@@ -41,14 +46,14 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <PasswordField fx:id="password" layoutX="74.0" layoutY="31.0" prefHeight="25.0" prefWidth="105.0" promptText="Password">
+                  <PasswordField fx:id="passwordField" layoutX="74.0" layoutY="31.0" prefHeight="25.0" prefWidth="105.0" promptText="Password">
                      <font>
                         <Font name="System Italic" size="12.0" />
                      </font>
                   </PasswordField>
                </children>
             </Group>
-            <Label fx:id="loginError" alignment="CENTER" layoutX="73.0" layoutY="286.0" prefHeight="32.0" prefWidth="155.0" textAlignment="CENTER" />
+            <Label fx:id="loginError" alignment="CENTER" layoutX="57.0" layoutY="292.0" prefHeight="73.0" prefWidth="192.0" textAlignment="CENTER" />
             <Group layoutX="73.0" layoutY="243.0">
                <children>
                   <Button fx:id="login" mnemonicParsing="false" onAction="#attemptLogIn" prefHeight="30.0" prefWidth="68.0" text="Log In" textAlignment="CENTER">
@@ -66,6 +71,6 @@
          </children></AnchorPane>
    </right>
    <padding>
-      <Insets left="15.0" right="15.0" />
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
    </padding>
 </BorderPane>

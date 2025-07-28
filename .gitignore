@@ -12,6 +12,10 @@ target/
 *.db
 *.sqlite3
 
+# Ignore all logs
+**/logs/
+*.log
+
 ### IntelliJ IDEA ###
 .idea/
 .idea/modules.xml

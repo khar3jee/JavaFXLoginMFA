@@ -9,6 +9,7 @@ module dev.dcardenas.javafxloginmfa {
     requires password4j;
     requires java.desktop;
     requires org.slf4j;
+    requires org.apache.commons.lang3;
 
     exports dev.dcardenas.javafxloginmfa.ui;
     opens dev.dcardenas.javafxloginmfa.ui to javafx.fxml;

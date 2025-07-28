@@ -12,6 +12,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.apache.commons.lang3.Validate.notBlank;
+
 
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -33,15 +35,13 @@ public class LoginController {
         String username = "";
         String password = "";
         try{
-            username = usernameField.getText().trim();
-            password = passwordField.getText().trim();
-          // add source ip 2025-06-15 18:40:48 ERROR d.d.j.ui.LoginController - getText field is null {}
-          // java.lang.NullPointerException: Cannot invoke "javafx.scene.control.TextField.getText()"
-            // because "this.usernameField" is null at
-          // dev.dcardenas.javafxloginmfa/dev.dcardenas.javafxloginmfa.ui.LoginController.attemptLogIn(LoginController.java:36)
-        } catch (NullPointerException e) {
+            username = notBlank(usernameField.getText().trim(), "Need Username");
+            password = notBlank(passwordField.getText().trim(), "Need Password");
+            System.out.println("Attempting to login user " + username + " with password " + password);
+        } catch (IllegalArgumentException | NullPointerException e) {
             loginError.setText("Username and password are required to login");
-            logger.error("getText field is null {}", e.getMessage()); //add ip to log
+            logger.error("getText field is null {}", e.getMessage());
+            //add ip to log
         }
 
         if (AuthenticationManager.authenticate(username, password)) {
