@@ -15,7 +15,7 @@
          <children>
             <ImageView fitHeight="249.0" fitWidth="290.0" layoutX="21.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../images/chatgpt_image_not_real.png" />
+                  <Image url="@../../../images/fake_co_logo.svg.png" />
                </image>
             </ImageView>
          </children></AnchorPane>

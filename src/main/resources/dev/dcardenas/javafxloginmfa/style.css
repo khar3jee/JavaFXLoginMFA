@@ -17,6 +17,23 @@
     -fx-text-fill: #AFB1B3;
 }
 
+/*Remove split pane border lines and divider lines*/
+
+.split-pane {
+    -fx-box-border: transparent;
+    -fx-border-color: transparent;
+    -fx-background-color: #2D2D30;
+    background-color: #2D2D30;
+}
+.split-pane:horizontal .split-pane-divider,
+.split-pane:vertical .split-pane-divider {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-pref-width: 0.5; /* you can fine-tune or remove this */
+}
 
 /* Pane */
 .pane-grid{
@@ -36,7 +53,6 @@
     background-color: #2D2D30;
     -fx-background-insets: 3 0 0 0;
 }
-
 
 /* TextField */
 .text-field{

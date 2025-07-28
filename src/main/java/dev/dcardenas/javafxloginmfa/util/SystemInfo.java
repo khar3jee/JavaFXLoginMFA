@@ -2,7 +2,7 @@ package dev.dcardenas.javafxloginmfa.util;
 
 /**
  * Helper class to identify system information such as operating system, java,
- * encoding set and instruction set architecture
+ * encoding set, monitor size and instruction set architecture
  */
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
