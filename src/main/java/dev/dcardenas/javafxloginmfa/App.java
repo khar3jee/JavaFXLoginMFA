@@ -1,6 +1,7 @@
 package dev.dcardenas.javafxloginmfa;
 
 import dev.dcardenas.javafxloginmfa.audit.AuditLogReader;
+import dev.dcardenas.javafxloginmfa.audit.AuditLogger;
 import dev.dcardenas.javafxloginmfa.db.DatabaseManager;
 import dev.dcardenas.javafxloginmfa.security.AuthenticationManager;
 import dev.dcardenas.javafxloginmfa.security.PepperGenerator;

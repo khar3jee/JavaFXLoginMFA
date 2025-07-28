@@ -6,6 +6,8 @@ package dev.dcardenas.javafxloginmfa.db;
 import java.io.File;
 import java.nio.file.Paths;
 import java.sql.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import dev.dcardenas.javafxloginmfa.user.User;

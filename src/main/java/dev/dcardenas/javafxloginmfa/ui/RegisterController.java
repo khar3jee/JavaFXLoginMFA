@@ -3,7 +3,6 @@ package dev.dcardenas.javafxloginmfa.ui;
 import com.password4j.Password;
 import dev.dcardenas.javafxloginmfa.db.DatabaseManager;
 import dev.dcardenas.javafxloginmfa.security.InputValidator;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
-
 
     @FXML
     private TextField usernameField;
@@ -63,10 +61,6 @@ public class RegisterController {
         } try { DatabaseManager.saveUser(this.user);
             logger.info("User Registered: {}", this.user.getUsername().value());
             ViewManager.switchView("/dev/dcardenas/javafxloginmfa/views/login-view.fxml");
-                //PauseTransition pause = new PauseTransition(Duration.seconds(2));
-                //pause.setOnFinished(event -> redirectToLogin());
-                //pause.play();
-            //} // Go back to login after registration
         } catch (SQLException e) {
                 logger.error("Error registering user: {}", e.getMessage());
                 registrationError.setText("User registration failed, please try again.");

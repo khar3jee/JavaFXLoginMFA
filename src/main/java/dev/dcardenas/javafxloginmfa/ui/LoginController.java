@@ -12,8 +12,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import static org.apache.commons.lang3.Validate.notBlank;
+
 
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -43,7 +43,6 @@ public class LoginController {
             logger.error("getText field is null {}", e.getMessage());
             //add ip to log
         }
-
 
         if (AuthenticationManager.authenticate(username, password)) {
             //add source ip

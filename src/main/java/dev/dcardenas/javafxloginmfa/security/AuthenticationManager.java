@@ -12,6 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import dev.dcardenas.javafxloginmfa.util.NetInfo;
 
 import dev.dcardenas.javafxloginmfa.user.User;
 import dev.dcardenas.javafxloginmfa.user.UserPassword;
@@ -44,7 +47,8 @@ public class AuthenticationManager {
 
 
     }
-    /**
+
+  /**
      * @param username
      * @param password
      * @return
@@ -52,7 +56,6 @@ public class AuthenticationManager {
 
     public static boolean authenticate(String username, String password) {
         //String sourceIp = "127.0.0.1";
-        System.out.println("Authenticating user " + username + " with password " + password);
         if (isAccountLocked(username)) {
             AuditLogger.log(username, "Authentication attempt", "LOGIN_FAILURE", "ACCOUNT_LOCKED");
             return false;
@@ -127,16 +130,7 @@ public class AuthenticationManager {
         return 0;
     }
 
-    /**private static void unlockAccount(String username) {
-        String sql = "UPDATE users SET locked_until = ? WHERE username = ?";
-        try{
-            (Connection conn = DatabaseManager.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setObject(1, LocalDateTime.now().);
-            }
-        }
-    }
-    **/
+
     private static void lockAccount(String username) {
         String sql = "UPDATE users SET locked_until = ? WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection();
