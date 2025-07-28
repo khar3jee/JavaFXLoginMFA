@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
 
-
     @FXML
     private TextField usernameField;
 

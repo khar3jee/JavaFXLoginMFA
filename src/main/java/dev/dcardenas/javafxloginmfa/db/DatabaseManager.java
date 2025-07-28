@@ -6,8 +6,8 @@ package dev.dcardenas.javafxloginmfa.db;
 import java.io.File;
 import java.nio.file.Paths;
 import java.sql.*;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import dev.dcardenas.javafxloginmfa.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
  * DatabaseManager manages the database, adds/removes entities, tables and updates
  */
 public class DatabaseManager {
-
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
     private static final String DB_PATH = Paths.get(System.getProperty("user.dir"), "db", "javafxlogin.sqlite").toString();
     private static final String DB_URL = "jdbc:sqlite:" + DB_PATH;

@@ -11,7 +11,6 @@ module dev.dcardenas.javafxloginmfa {
     requires org.slf4j;
     requires org.apache.commons.lang3;
 
-
     exports dev.dcardenas.javafxloginmfa.ui;
     opens dev.dcardenas.javafxloginmfa.ui to javafx.fxml;
     opens dev.dcardenas.javafxloginmfa to javafx.fxml;
